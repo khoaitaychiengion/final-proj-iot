@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "author": "Bằng Phạm Thế",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-mini", "id": "bb1", "top": 286.6, "left": 36, "attrs": {} },
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 38.4, "left": -52.76, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 75.5, "left": 95.8, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": 57.9, "left": 225, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:5V", "bb1:1t.e", "red", [ "h-19.05", "v105.6", "h9.6" ] ],
+    [ "pot1:VCC", "bb1:1t.a", "red", [ "v124.8", "h-96.8" ] ],
+    [ "dht1:VCC", "bb1:1t.b", "red", [ "v86.4", "h-211.2", "v48" ] ],
+    [ "dht1:GND", "bb1:1b.j", "black", [ "v259.2", "h-220.8" ] ],
+    [ "esp:GND.1", "bb1:1b.f", "black", [ "h-38.25", "v172.8", "h9.6" ] ],
+    [ "pot1:GND", "bb1:1b.g", "black", [ "v134.4", "h-124.8", "v96" ] ],
+    [ "pot1:SIG", "esp:34", "green", [ "v-115.2", "h-211.6", "v86.4" ] ],
+    [ "dht1:SDA", "esp:15", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
