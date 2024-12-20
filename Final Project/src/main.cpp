@@ -14,6 +14,7 @@ PubSubClient mqttClient(wifiClient);
 
 int SOLID_MOISTURE_PIN = 34;
 int DHT_PIN = 15;
+int WATER_PUMP_PIN = 25
 DHTesp dhtSensor;
 
 void wifiConnect()
