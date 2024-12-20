@@ -3,10 +3,10 @@
 #include "PubSubClient.h"
 #include "DHTesp.h"
 
-const char* ssid = "Wokwi-GUEST";
-const char* password = "";
+const char *ssid = "Wokwi-GUEST";
+const char *password = "";
 
-const char* mqttServer = "broker.mqtt-dashboard.com";
+const char *mqttServer = "broker.mqtt-dashboard.com";
 int port = 1883;
 
 WiFiClient wifiClient;
@@ -16,48 +16,82 @@ int SOLID_MOISTURE_PIN = 34;
 int DHT_PIN = 15;
 DHTesp dhtSensor;
 
-void wifiConnect() {
+void wifiConnect()
+{
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
   Serial.println(" Connected!");
 }
 
-void mqttConnect() {
-  while (!mqttClient.connected()) {
+void mqttConnect()
+{
+  while (!mqttClient.connected())
+  {
     Serial.println("Attemping MQTT connection...");
     String clientId = "ESP32Client-";
     clientId += String(random(0xffff), HEX);
 
-    if (mqttClient.connect(clientId.c_str())) {
+    if (mqttClient.connect(clientId.c_str()))
+    {
       Serial.println("connected");
 
       //***Subscribe all topic you need***
     }
 
-    else {
+    else
+    {
       Serial.println("try again in 5 seconds");
       delay(5000);
     }
   }
 }
 
-//MQTT Receiver
-void callback(char* topic, byte* message, unsigned int length) {
+// MQTT Receiver
+void callback(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Message arrived on topic: ");
   Serial.println(topic);
-  String strMsg;
-  for(int i=0; i<length; i++) {
-    strMsg += (char)message[i];
+  Serial.print("Message: ");
+
+  String message = "";
+  for (unsigned int i = 0; i < length; i++)
+  {
+    message += (char)payload[i];
   }
-  Serial.println(strMsg);
+  Serial.println(message);
+  if (String(topic) == "esp/control")
+  {
+    if (message.startsWith("WATER"))
+    {
+      // Parse command
+      int intensity = 0; // From 0-100 (%)
+      int duration = 0;
+      sscanf(message.c_str(), "WATER %d %d", &intensity, &duration);
 
-  //***Code here to process the received package***
+      // Map intensity to PWM (Pulse Width Modulation) value (0-255)
+      int pwmValue = map(intensity, 0, 100, 0, 255);
 
+      analogWrite(WATER_PUMP_PIN, pwmValue);
+      Serial.print("Water pump intensity set to: ");
+      Serial.println(intensity);
+
+      // Duration
+      if (duration > 0)
+      {
+        delay(duration * 1000);
+        analogWrite(WATER_PUMP_PIN, 0); // Turn off pump after duration
+        Serial.println("Water pump turned OFF after duration");
+      }
+    }
+  }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   pinMode(SOLID_MOISTURE_PIN, INPUT);
@@ -68,11 +102,13 @@ void setup() {
 
   mqttClient.setServer(mqttServer, port);
   mqttClient.setCallback(callback);
-  mqttClient.setKeepAlive( 90 );
+  mqttClient.setKeepAlive(90);
 }
 
-void loop() {
-  if (!mqttClient.connected()) {
+void loop()
+{
+  if (!mqttClient.connected())
+  {
     mqttConnect();
   }
   mqttClient.loop();
