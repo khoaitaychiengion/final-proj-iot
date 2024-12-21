@@ -101,7 +101,8 @@ void saveToFireBase(char timePath[], String topic, char buffer[]) {
 
   if (Firebase.setString(firebaseData, fullPath, msg)) {
       Serial.print(topic);
-      Serial.println(" sent to Firebase!");
+      Serial.print(" sent to Firebase! - Msg: ");
+      Serial.println(msg);
   } else {
       Serial.print("Firebase error: " );
       Serial.println(firebaseData.errorReason());
