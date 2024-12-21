@@ -63,7 +63,7 @@ void mqttConnect() {
       Serial.println("connected");
 
       //***Subscribe all topic you need***
-      mqttClient.subscribe("dataFromWeb");
+      mqttClient.subscribe("data/dataFromWeb");
     }
 
     else {
@@ -171,8 +171,8 @@ void loop() {
     int minute = timeinfo.tm_min;
     int second = timeinfo.tm_sec;
 
-    char timePath[20];
-    snprintf(timePath, sizeof(timePath), "%02d-%02d-%04d/%02d:%02d:%02d", day, month, year, hour, minute, second);
+    char timePath[25];
+    snprintf(timePath, sizeof(timePath), "data/%02d-%02d-%04d/%02d:%02d:%02d", day, month, year, hour, minute, second);
 
     // read and send data to database
 
@@ -182,16 +182,16 @@ void loop() {
     char buffer[20];
     sprintf(buffer, "%d%%", solidMoisturePercentage);
     saveToFireBase(timePath, "SoilMoisture", buffer);
-    mqttClient.publish("dataFromESP32/solidMoisture", buffer);
+    mqttClient.publish("data/dataFromESP32/solidMoisture", buffer);
 
     // DHT22 sensor: read data, save data to database, send data to web
     TempAndHumidity tempAndHumidData = dhtSensor.getTempAndHumidity();
     sprintf(buffer, "%.1f°C", tempAndHumidData.temperature);
     saveToFireBase(timePath, "Temperature", buffer);
-    mqttClient.publish("dataFromESP32/temperature", buffer);
+    mqttClient.publish("data/dataFromESP32/temperature", buffer);
     sprintf(buffer, "%.2f%%", tempAndHumidData.humidity);
     saveToFireBase(timePath, "Humidity", buffer); 
-    mqttClient.publish("dataFromESP32/humidity", buffer);
+    mqttClient.publish("data/dataFromESP32/humidity", buffer);
 
     // read and save data of water level sensor
     int levelOfWater = digitalRead(WATER_LEVEL_PIN);
@@ -201,7 +201,7 @@ void loop() {
       sprintf(buffer, "Full of water");
     }
     saveToFireBase(timePath, "WaterLevel", buffer);
-    mqttClient.publish("dataFromESP32/waterlevel", buffer);
+    mqttClient.publish("data/dataFromESP32/waterlevel", buffer);
 
     // read and save data of light sensor
     int lightIntensity = analogRead(LIGHT_SENSOR_PIN);
@@ -213,7 +213,7 @@ void loop() {
       sprintf(buffer, "Too much brightness");
     }
     saveToFireBase(timePath, "Light", buffer); 
-    mqttClient.publish("dataFromESP32/light", buffer);
+    mqttClient.publish("data/dataFromESP32/light", buffer);
   }
 
   //delay(5000);
